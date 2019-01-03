@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	engineUtil "github.com/purpleidea/mgmt/engine/util"
+	"github.com/purpleidea/mgmt/lang/types"
 )
 
 func TestStructTagToFieldName0(t *testing.T) {
@@ -173,5 +174,68 @@ func TestLowerStructFieldNameToFieldName2(t *testing.T) {
 	if !reflect.DeepEqual(mapping, expected) {
 		t.Errorf("expected: %+v", expected)
 		t.Errorf("received: %+v", mapping)
+	}
+}
+
+func TestLangFieldNameToStructType0(t *testing.T) {
+	// map[string]*types.Type
+	typMap, err := engineUtil.LangFieldNameToStructType("test")
+	if err != nil {
+		t.Errorf("unexpected error: %+v", err)
+		return
+	}
+	t.Logf("type map is: %+v", typMap)
+
+	expected := map[string]*types.Type{
+		"bool": types.TypeBool,
+		"str":  types.TypeStr,
+
+		"int":   types.TypeInt,
+		"int8":  types.TypeInt,
+		"int16": types.TypeInt,
+		"int32": types.TypeInt,
+		"int64": types.TypeInt,
+
+		"uint":   types.TypeInt,
+		"uint8":  types.TypeInt,
+		"uint16": types.TypeInt,
+		"uint32": types.TypeInt,
+		"uint64": types.TypeInt,
+
+		"byte": types.TypeInt,
+
+		"rune": types.TypeInt,
+
+		"float32": types.TypeFloat,
+		"float64": types.TypeFloat,
+		//"complex64": ???,
+		//"complex128": ???,
+
+		"boolptr":   types.TypeBool,
+		"stringptr": types.TypeStr,
+		"int64ptr":  types.TypeInt,
+		"int8ptr":   types.TypeInt,
+		"uint8ptr":  types.TypeInt,
+
+		"int8ptrptrptr": types.TypeInt,
+
+		"slicestring": types.NewType("[]str"),
+		"mapintfloat": types.NewType("map{int: float}"),
+		"mixedstruct": types.NewType("struct{somebool bool; somestr str; someint int; somefloat float; somestruct struct{somenestedbool bool; somenestedstr str}; someembeddedstructptr struct{someembeddedbool bool; someembeddedstr str}}"),
+		//"interface": ???,
+
+		"anotherstr": types.TypeStr,
+
+		"validatebool":  types.TypeBool,
+		"validateerror": types.TypeStr,
+		"alwaysgroup":   types.TypeBool,
+		"comparefail":   types.TypeBool,
+		"sendvalue":     types.TypeStr,
+
+		"comment": types.TypeStr,
+	}
+	if !reflect.DeepEqual(typMap, expected) {
+		t.Errorf("expected: %+v", expected)
+		t.Errorf("received: %+v", typMap)
 	}
 }
