@@ -34,6 +34,9 @@ var (
 	TypeVariant = NewType("variant")
 )
 
+// StructTag is the key we use in struct field names for key mapping.
+const StructTag = "lang"
+
 //go:generate stringer -type=Kind -output=kind_stringer.go
 
 // The Kind represents the base type of each value.
