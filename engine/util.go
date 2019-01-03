@@ -18,8 +18,80 @@
 package engine
 
 import (
+	"fmt"
+	"reflect"
 	"sort"
+	"strings"
 )
+
+// resourceRegisterCheck checks that each resource is safe to register. It is
+// only called in tests and in the resource Register function. It checks that
+// the exported fields don't contain any structs that contain unexported fields,
+// because this can cause parts of our code to panic because reflect.StructOf is
+// lame.
+func resourceRegisterCheck(res Res) error {
+	ts := reflect.TypeOf(res).Elem() // pointer to struct, then struct
+	if k := ts.Kind(); k != reflect.Struct {
+		return fmt.Errorf("expected struct, got: %s", k)
+	}
+
+	for i := 0; i < ts.NumField(); i++ {
+		field := ts.Field(i)
+
+		// skip embedded traits.* structs
+		if strings.HasPrefix(field.Type.String(), "traits.") {
+			continue
+		}
+		// skip top-level private fields
+		if s := strings.ToUpper(field.Name[0:1]); s != field.Name[0:1] {
+			continue
+		}
+		// check the nested type!
+		if err := structCheck(field.Type); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// structCheck is a helper function for recursive checking of structs. It errors
+// if it finds a struct field that is unexported.
+func structCheck(st reflect.Type) error {
+	switch st.Kind() {
+	case reflect.Array, reflect.Slice:
+		return structCheck(st.Elem())
+
+	case reflect.Map:
+		if err := structCheck(st.Key()); err != nil {
+			return err
+		}
+		return structCheck(st.Elem())
+
+	case reflect.Ptr:
+		return structCheck(st.Elem()) // TODO: is this correct?
+
+	case reflect.Struct:
+		// handle struct at the end
+	default:
+		return nil // we don't need to handle these
+	}
+
+	// check the struct
+	for j := 0; j < st.NumField(); j++ { // new counter var for fun
+		name := st.Field(j).Name
+		if s := strings.ToUpper(name[0:1]); s != name[0:1] {
+			return fmt.Errorf("private field found: %s", name)
+		}
+
+		// recurse
+		if err := structCheck(st.Field(j).Type); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 // ResourceSlice is a linear list of resources. It can be sorted.
 type ResourceSlice []Res
