@@ -159,12 +159,30 @@ func TestUnification1(t *testing.T) {
 		s := &ExprStr{}
 		i := &ExprInt{}
 		f := &ExprFloat{}
+		b1 := &ExprBool{}
+		s1 := &ExprStr{}
+		st1 := &ExprStruct{
+			Fields: []*ExprStructField{
+				{Name: "somenestedbool", Value: b1},
+				{Name: "somenestedstr", Value: s1},
+			},
+		}
+		b2 := &ExprBool{}
+		s2 := &ExprStr{}
+		st2 := &ExprStruct{
+			Fields: []*ExprStructField{
+				{Name: "someembeddedbool", Value: b2},
+				{Name: "someembeddedstr", Value: s2},
+			},
+		}
 		expr := &ExprStruct{
 			Fields: []*ExprStructField{
 				{Name: "somebool", Value: b},
 				{Name: "somestr", Value: s},
 				{Name: "someint", Value: i},
 				{Name: "somefloat", Value: f},
+				{Name: "somestruct", Value: st1},
+				{Name: "someembeddedstructptr", Value: st2},
 			},
 		}
 		stmt := &StmtProg{
@@ -190,7 +208,7 @@ func TestUnification1(t *testing.T) {
 				s:    types.TypeStr,
 				i:    types.TypeInt,
 				f:    types.TypeFloat,
-				expr: types.NewType("struct{somebool bool; somestr str; someint int; somefloat float}"),
+				expr: types.NewType("struct{somebool bool; somestr str; someint int; somefloat float; somestruct struct{somenestedbool bool; somenestedstr str}; someembeddedstructptr struct{someembeddedbool bool; someembeddedstr str}}"),
 			},
 		})
 	}

@@ -75,10 +75,15 @@ type TestRes struct {
 	SliceString []string          `lang:"slicestring" yaml:"slicestring"`
 	MapIntFloat map[int64]float64 `lang:"mapintfloat" yaml:"mapintfloat"`
 	MixedStruct struct {
-		somebool  bool
-		somestr   string
-		someint   int64
-		somefloat float64
+		SomeBool   bool    `lang:"somebool" yaml:"somebool"`
+		SomeStr    string  `lang:"somestr" yaml:"somestr"`
+		SomeInt    int64   `lang:"someint" yaml:"someint"`
+		SomeFloat  float64 `lang:"somefloat" yaml:"somefloat"`
+		SomeStruct struct {
+			SomeNestedBool bool   `lang:"somenestedbool" yaml:"somenestedbool"`
+			SomeNestedStr  string `lang:"somenestedstr" yaml:"somenestedstr"`
+		} `lang:"somestruct" yaml:"somestruct"`
+		SomeEmbeddedStructPtr *EmbeddedStruct `lang:"someembeddedstructptr" yaml:"someembeddedstructptr"`
 	} `lang:"mixedstruct" yaml:"mixedstruct"`
 	Interface interface{} `lang:"interface" yaml:"interface"`
 
@@ -93,6 +98,12 @@ type TestRes struct {
 	// TODO: add more fun properties!
 
 	Comment string `lang:"comment" yaml:"comment"`
+}
+
+// EmbeddedStruct is a struct that is used in the Test resource.
+type EmbeddedStruct struct {
+	SomeEmbeddedBool bool   `lang:"someembeddedbool" yaml:"someembeddedbool"`
+	SomeEmbeddedStr  string `lang:"someembeddedstr" yaml:"someembeddedstr"`
 }
 
 // Default returns some sensible defaults for this resource.
