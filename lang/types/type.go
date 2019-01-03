@@ -147,9 +147,14 @@ func TypeOf(t reflect.Type) (*Type, error) {
 			if err != nil {
 				return nil, err
 			}
+			name := field.Name
+			// use the actual field alias if present
+			if alias, ok := field.Tag.Lookup(StructTag); ok { // golang 1.7+
+				name = alias
+			}
 			// TODO: should we skip over fields with field.Anonymous ?
-			m[field.Name] = tt
-			ord = append(ord, field.Name) // in order
+			m[name] = tt
+			ord = append(ord, name) // in order
 			// NOTE: we discard the field.Tag data
 		}
 

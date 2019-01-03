@@ -20,6 +20,7 @@
 package types
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -1297,4 +1298,23 @@ func TestType3(t *testing.T) {
 
 func TestTypeOf0(t *testing.T) {
 	// TODO: implement testing of the TypeOf function
+	type MyStruct struct {
+		SomeBool     bool   `lang:"somebool"`
+		SomeStr      string `lang:"somestr"`
+		NestedStruct struct {
+			SomeInt   bool   `lang:"someint"`
+			SomeFloat string `lang:"somefloat"`
+		} `lang:"nestedstruct"`
+	}
+	rt := reflect.TypeOf(&MyStruct{})
+	typ, err := TypeOf(rt)
+	if err != nil {
+		t.Errorf("unexpected error: %+v", err)
+		return
+	}
+	exp := NewType("struct{somebool bool; somestr str; nestedstruct struct{someint bool; somefloat str}}")
+	if err := exp.Cmp(typ); err != nil {
+		t.Errorf("type: `%+v` did not match expected: `%+v`", typ, exp)
+		return
+	}
 }
