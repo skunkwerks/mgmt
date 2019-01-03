@@ -1,0 +1,22 @@
+Edge: bool(false) -> struct(someembeddedbool: bool(false); someembeddedstr: str(wow)) # someembeddedbool
+Edge: bool(true) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # somebool
+Edge: bool(true) -> struct(somenestedbool: bool(true); somenestedstr: str(world)) # somenestedbool
+Edge: float(3.14) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # somefloat
+Edge: int(42) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # someint
+Edge: str(hello) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # somestr
+Edge: str(world) -> struct(somenestedbool: bool(true); somenestedstr: str(world)) # somenestedstr
+Edge: str(wow) -> struct(someembeddedbool: bool(false); someembeddedstr: str(wow)) # someembeddedstr
+Edge: struct(someembeddedbool: bool(false); someembeddedstr: str(wow)) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # someembeddedstructptr
+Edge: struct(somenestedbool: bool(true); somenestedstr: str(world)) -> struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))) # somestruct
+Vertex: bool(false)
+Vertex: bool(true)
+Vertex: bool(true)
+Vertex: float(3.14)
+Vertex: int(42)
+Vertex: str(hello)
+Vertex: str(s1)
+Vertex: str(world)
+Vertex: str(wow)
+Vertex: struct(somebool: bool(true); somestr: str(hello); someint: int(42); somefloat: float(3.14); somestruct: struct(somenestedbool: bool(true); somenestedstr: str(world)); someembeddedstructptr: struct(someembeddedbool: bool(false); someembeddedstr: str(wow)))
+Vertex: struct(someembeddedbool: bool(false); someembeddedstr: str(wow))
+Vertex: struct(somenestedbool: bool(true); somenestedstr: str(world))

@@ -1,0 +1,17 @@
+# test that passing in a complete struct (no missing fields) works!
+test "s1" {
+	mixedstruct => struct{
+		somebool => true,
+		somestr => "hello",
+		someint => 42,
+		somefloat => 3.14,
+		somestruct => struct{
+			somenestedbool => true,
+			somenestedstr => "world",
+		},
+		someembeddedstructptr => struct{
+			someembeddedbool => false,
+			someembeddedstr => "wow",
+		},
+	},
+}
