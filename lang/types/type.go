@@ -764,10 +764,11 @@ func (obj *Type) Reflect() reflect.Type {
 				panic("malformed struct field")
 			}
 
+			//tag := fmt.Sprintf(`%s:"%s"`, StructTag, k)
 			fields = append(fields, reflect.StructField{
 				Name: k, // struct field name
 				Type: t.Reflect(),
-				//Tag:  `mgmt:"foo"`, // unused
+				//Tag: reflect.StructTag(tag), // bonus
 			})
 		}
 
