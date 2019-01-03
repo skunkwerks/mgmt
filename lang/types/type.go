@@ -755,6 +755,12 @@ func (obj *Type) Reflect() reflect.Type {
 			if t == nil {
 				panic("malformed struct field")
 			}
+			// NOTE: unexported fields can cause StructOf to panic!
+			// This is an upstream mistake AFAICT, and might change.
+			// See: https://github.com/golang/go/issues/25401
+			//if s := strings.ToUpper(k[0:1]); s != k[0:1] {
+			//	continue
+			//}
 
 			fields = append(fields, reflect.StructField{
 				Name: k, // struct field name

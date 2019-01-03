@@ -40,6 +40,12 @@ func RegisterResource(kind string, fn func() Res) {
 	if _, ok := registeredResources[kind]; ok {
 		panic(fmt.Sprintf("a resource kind of %s is already registered", kind))
 	}
+
+	// check for unexported fields that aren't usable and will cause a panic
+	if err := resourceRegisterCheck(f); err != nil {
+		panic(fmt.Sprintf("can't register resource: `%s`, %s", kind, err))
+	}
+
 	gob.Register(f)
 	registeredResources[kind] = fn
 }
