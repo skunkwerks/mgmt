@@ -76,6 +76,8 @@ type State struct {
 	// to notify the Process loop which reads from this.
 	outputChan chan error // outgoing from resource
 
+	pauseChan chan *event.Msg // messages telling Process that we're pausing
+
 	wg   *sync.WaitGroup
 	exit *util.EasyExit
 
@@ -97,6 +99,8 @@ func (obj *State) Init() error {
 	obj.eventsLock = &sync.Mutex{}
 
 	obj.outputChan = make(chan error)
+
+	obj.pauseChan = make(chan *event.Msg)
 
 	obj.wg = &sync.WaitGroup{}
 	obj.exit = util.NewEasyExit()
@@ -293,6 +297,28 @@ func (obj *State) Event(msg *event.Msg) {
 	}
 }
 
+// handleACK sends an ACK request to the correct channel if an ACK can be sent
+// for this message. On success this returns nil. On engine shutdown or if it is
+// the wrong kind of message, then it returns an error. This is just a helper
+// function so that we don't repeat code.
+func (obj *State) handleACK(msg *event.Msg) error {
+	// ask for an ACK on this message (usually a pause)
+	if msg.CanACK() {
+		if msg.Kind != event.KindPause {
+			// TODO: we only do this for pause at the moment...
+			return fmt.Errorf("unexpected kind: %v", msg.Kind)
+		}
+		select {
+		case obj.pauseChan <- msg:
+			// send the ACK request (it will get ACK'ed immediately)
+
+		case <-obj.exit.Signal(): // you never know ¯\_(ツ)_/¯
+			return fmt.Errorf("unexpected exit")
+		}
+	}
+	return nil
+}
+
 // read is a helper function used inside the main select statement of resources.
 // If it returns an error, then this is a signal for the resource to exit.
 func (obj *State) read(msg *event.Msg) error {
@@ -308,6 +334,11 @@ func (obj *State) read(msg *event.Msg) error {
 
 	default:
 		return fmt.Errorf("unhandled event: %+v", msg.Kind)
+	}
+
+	// ask for an ACK on this pause message
+	if err := obj.handleACK(msg); err != nil {
+		return err
 	}
 
 	// we're paused now
@@ -357,6 +388,11 @@ func (obj *State) event() error {
 			case event.KindStart:
 				return fmt.Errorf("unexpected start")
 			case event.KindPause:
+				// ask for an ACK on this pause message
+				if err := obj.handleACK(msg); err != nil {
+					return err
+				}
+
 				// pass
 			case event.KindExit:
 				return engine.ErrSignalExit

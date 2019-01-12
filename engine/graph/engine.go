@@ -313,7 +313,14 @@ func (obj *Engine) Pause(fastPause bool) {
 	for _, vertex := range topoSort { // squeeze out the events...
 		// The Event is sent to an unbuffered channel, so this event is
 		// synchronous, and as a result it blocks until it is received.
-		obj.state[vertex].Event(event.Pause)
+		// This needs to wait until we reach the paused state for Watch
+		// but also wait until the generated events from Watch are done
+		// and that CheckApply isn't running anymore, because we do not
+		// want CheckApply to BackPoke to a vertex which has exited and
+		// which no longer has a obj.state[vertex] entry still present.
+		msg := event.NewMsg(event.KindPause)
+		obj.state[vertex].Event(msg)
+		msg.Wait() // TODO: ctx ?
 	}
 
 	// we are now completely paused...

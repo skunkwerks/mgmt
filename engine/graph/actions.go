@@ -349,6 +349,7 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 	// Example, if Process errors permanently, we should ask Watch to exit.
 	defer obj.state[vertex].Event(event.Exit) // signal an exit
 	for {
+		// we might wait here when we're paused
 		select {
 		case err, ok := <-obj.state[vertex].outputChan: // read from watch channel
 			if !ok {
@@ -357,6 +358,13 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 			if err != nil {
 				return err // permanent failure
 			}
+
+		case msg, ok := <-obj.state[vertex].pauseChan:
+			if !ok {
+				return fmt.Errorf("unexpected close of pause chan")
+			}
+			msg.ACK()
+			continue
 
 			// safe to go run the process...
 		case <-obj.state[vertex].exit.Signal(): // TODO: is this needed?
@@ -373,6 +381,7 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 			timer := time.NewTimer(time.Duration(d) * time.Millisecond)
 		LimitWait:
 			for {
+				// we might wait here when we're paused
 				select {
 				case <-timer.C: // the wait is over
 					break LimitWait
@@ -394,6 +403,13 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 					}
 					count++                         // count the events...
 					limiter.ReserveN(time.Now(), 1) // one event
+
+				case msg, ok := <-obj.state[vertex].pauseChan:
+					if !ok {
+						return fmt.Errorf("unexpected close of pause chan")
+					}
+					msg.ACK()
+					continue
 				}
 			}
 			timer.Stop() // it's nice to cleanup
@@ -410,6 +426,7 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 				timer := time.NewTimer(time.Duration(delay) * time.Millisecond)
 			RetryWait:
 				for {
+					// we might wait here when we're paused
 					select {
 					case <-timer.C: // the wait is over
 						break RetryWait
@@ -432,6 +449,13 @@ func (obj *Engine) Worker(vertex pgraph.Vertex) error {
 						}
 						count++                         // count the events...
 						limiter.ReserveN(time.Now(), 1) // one event
+
+					case msg, ok := <-obj.state[vertex].pauseChan:
+						if !ok {
+							return fmt.Errorf("unexpected close of pause chan")
+						}
+						msg.ACK()
+						continue
 					}
 				}
 				timer.Stop() // it's nice to cleanup
