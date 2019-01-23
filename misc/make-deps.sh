@@ -71,6 +71,7 @@ if [ ! -z "$PKG" ]; then
 	    shells/bash \
 	    textproc/augeas \
 	    textproc/rubygem-kramdown
+	    www/rubygem-toml-rb \
 fi
 
 if [ $travis -eq 0 ]; then
