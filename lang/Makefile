@@ -28,7 +28,8 @@ clean:
 	rm lexer.nn.go y.go y.output || true
 
 lexer.nn.go: lexer.nex
-	nex -e lexer.nex
+	# nex is a common UNIX alias for various editors
+	/usr/local/bin/nex -e lexer.nex
 	@ROOT="$$( cd "$$( dirname "$${BASH_SOURCE[0]}" )" && cd .. && pwd )" && $$ROOT/misc/header.sh 'lexer.nn.go'
 
 y.go: parser.y
