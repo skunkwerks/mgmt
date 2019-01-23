@@ -15,11 +15,12 @@ Once you're familiar with the general idea, please start hacking...
 
 * You need golang version 1.10 or greater installed.
 	* To install on rpm style systems: `sudo dnf install golang`
+	* To install on FreeBSD systems: `sudo pkg install lang/go`
 	* To install on apt style systems: `sudo apt install golang`
 	* To install on macOS systems install [Homebrew](https://brew.sh)
 	and run: `brew install go`
 * You can run `go version` to check the golang version.
-* If your distro is tool old, you may need to [download](https://golang.org/dl/)
+* If your distro is too old, you may need to [download](https://golang.org/dl/)
 a newer golang version.
 
 ### Setting up golang
