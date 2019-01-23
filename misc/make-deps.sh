@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # setup a simple go environment
 XPWD=`pwd`
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"	# dir!
@@ -17,13 +17,14 @@ DNF=`command -v dnf 2>/dev/null`
 APT=`command -v apt-get 2>/dev/null`
 BREW=`command -v brew 2>/dev/null`
 PACMAN=`command -v pacman 2>/dev/null`
+PKG=`command -v /usr/sbin/pkg 2>/dev/null`
 
 # if DNF is available use it
 if [ -x "$DNF" ]; then
 	YUM=$DNF
 fi
 
-if [ -z "$YUM" -a -z "$APT" -a -z "$BREW" -a -z "$PACMAN" ]; then
+if [ -z "$YUM" -a -z "$APT" -a -z "$BREW" -a -z "$PACMAN" -a -z "$PKG" ]; then
 	echo "The package managers can't be found."
 	exit 1
 fi
@@ -57,6 +58,19 @@ fi
 
 if [ ! -z "$PACMAN" ]; then
 	$sudo_command $PACMAN -S --noconfirm --asdeps --needed libvirt augeas rubygems libpcap
+fi
+
+if [ ! -z "$PKG" ]; then
+	$sudo_command $PKG install -y \
+	    devel/go-bindata \
+	    devel/libvirt \
+	    devel/ruby-gems \
+	    devel/rubygem-json \
+	    lang/go \
+	    net/libpcap \
+	    shells/bash \
+	    textproc/augeas \
+	    textproc/rubygem-kramdown
 fi
 
 if [ $travis -eq 0 ]; then
